@@ -1,6 +1,6 @@
 import os
 import time
-import telebot  # da pyTelegramBotAPI
+import telebot
 import random
 
 bot_token = os.getenv("BOT_TOKEN")

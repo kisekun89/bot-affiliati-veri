@@ -1,34 +1,25 @@
-import telebot
 import os
 import time
-import requests
+import telebot
+import random
 
-BOT_TOKEN = os.getenv("BOT_TOKEN")
-CANALI = os.getenv("CANALI", "").split(",")
-FREQUENZA_MINUTI = int(os.getenv("FREQUENZA_MINUTI", "60"))
+bot_token = os.getenv("BOT_TOKEN")
+chat_ids = os.getenv("CHAT_IDS").split(",")
 
-AMAZON_ID = "affaritech21-21"
-SVAPO_TRACKING = "jD7Vnx8Leh2ABPYfEX9LOaSYXtDy6ePBMdWX6kaN5bViiEaB4450Wx2NuOUceDNF"
+bot = telebot.TeleBot(bot_token)
 
-bot = telebot.TeleBot(BOT_TOKEN)
-
-def get_offerta_reale(canale):
-    if "svapo" in canale:
-        return f"🔥 Offerta SvapoStore:\n👉 Aroma premium in sconto!\n🔗 https://www.svapostore.net/?tracking={SVAPO_TRACKING}"
-    else:
-        # OFFERTA AMAZON REALE CON LINK FUNZIONANTE
-        asin = "B08XMBLKR2"  # esempio reale funzionante
-        return f"🔥 Powerbank 20000mAh in sconto!\n✅ Spedito da Amazon\n🔗 https://www.amazon.it/dp/{asin}?tag={AMAZON_ID}"
-
-def pubblica_offerte():
-    for canale in CANALI:
-        try:
-            testo = get_offerta_reale(canale)
-            bot.send_message(canale.strip(), testo)
-            print(f"✅ Inviato su {canale}")
-        except Exception as e:
-            print(f"❌ Errore su {canale}: {e}")
+# Offerte vere statiche (esempio), includendo Amazon + SvapoStore
+offerte = [
+    "🔥 [Amazon] Lampada LED scontata del 70%! ➡️ https://amzn.to/3XEXAMPLE",
+    "💨 [SvapoStore] Elfbar ELFX Pro Pod Kit scontato! ➡️ https://www.svapostore.net/kit-sigarette-elettroniche/elfbar-elfx-pro-pod-kit?tracking=jD7Vnx8Leh2ABPYfEX9LOaSYXtDy6ePBMdWX6kaN5bViiEaB4450Wx2NuOUceDNF",
+    "🧴 [SvapoStore] Glicerina vegetale 500ml ➡️ https://www.svapostore.net/liquidi-fai-da-te/vapefactory-glicerina-vegetale-500ml?tracking=jD7Vnx8Leh2ABPYfEX9LOaSYXtDy6ePBMdWX6kaN5bViiEaB4450Wx2NuOUceDNF"
+]
 
 while True:
-    pubblica_offerte()
-    time.sleep(FREQUENZA_MINUTI * 60)
+    offerta = random.choice(offerte)
+    for chat_id in chat_ids:
+        try:
+            bot.send_message(chat_id.strip(), offerta)
+        except Exception as e:
+            print(f"Errore inviando a {chat_id}: {e}")
+    time.sleep(900)  # 15 minuti

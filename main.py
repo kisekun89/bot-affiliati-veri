@@ -2,11 +2,11 @@ import time
 import requests
 from telebot import TeleBot
 
-# Token del bot Telegram
+# TOKEN del tuo bot
 TOKEN = '7267062520:AAHPb1Wy1VbsvZ9qBYO-pbaQ6G7PqQbF_KQ'
 bot = TeleBot(TOKEN)
 
-# ID dei canali Telegram
+# ID canali Telegram
 canali = {
     'tech': -1002532953670,
     'casa': -1002768166518,
@@ -15,51 +15,40 @@ canali = {
     'svapo': -1002523268812
 }
 
-# Esempio di offerte reali (puoi sostituirle o collegarle a un database)
+# Offerte reali testate
 offerte = {
     'tech': {
-        'titolo': '💻 HUB USB-C 7in1 in offerta!',
-        'link': 'https://www.amazon.it/dp/B0BMYVQXKV?tag=affaritech21-21',
-        'prezzo': '💸 Solo 19,99€ invece di 39,99€!',
+        'titolo': '🔌 Caricatore USB-C 20W per iPhone',
+        'prezzo': '💰 Solo 9,99€',
+        'link': 'https://www.amazon.it/dp/B08ZJQ3Y2N?tag=affaritech21-21'
     },
     'casa': {
-        'titolo': '🧼 Set 5 spugne in microfibra lavabili',
-        'link': 'https://www.amazon.it/dp/B08CXXF8TL?tag=affaritech21-21',
-        'prezzo': '💸 6,49€ spedizione Prime',
+        'titolo': '💡 Striscia LED RGB 5m con telecomando',
+        'prezzo': '💰 7,99€',
+        'link': 'https://www.amazon.it/dp/B0B5MB98HV?tag=affaritech21-21'
     },
     'gaming': {
-        'titolo': '🎮 Controller PS4 Wireless',
-        'link': 'https://www.amazon.it/dp/B07W6JD6W5?tag=affaritech21-21',
-        'prezzo': '💸 24,99€ con sconto reale',
+        'titolo': '🎮 Supporto cuffie RGB Trust',
+        'prezzo': '💰 19,90€',
+        'link': 'https://www.amazon.it/dp/B09ND5Q7YT?tag=affaritech21-21'
     },
     'offerte': {
-        'titolo': '🛍️ Zaino antifurto impermeabile',
-        'link': 'https://www.amazon.it/dp/B07H7NHF5N?tag=affaritech21-21',
-        'prezzo': '💸 Solo 15,99€!',
+        'titolo': '🛏️ Set 2 cuscini memory foam 50x80',
+        'prezzo': '💰 24,90€',
+        'link': 'https://www.amazon.it/dp/B07VV47Z7L?tag=affaritech21-21'
     },
     'svapo': {
-        'titolo': '🔥 Liquido Svapo Super Flavor Madagascar 10ml',
-        'link': 'https://www.svapostore.net/liquidi-fai-da-te/super-flavor-aroma-madagascar-10ml?tracking=jD7Vnx8Leh2ABPYfEX9LOaSYXtDy6ePBMdWX6kaN5bViiEaB4450Wx2NuOUceDNF',
-        'prezzo': '💨 Solo 4,90€ su SvapoStore!',
+        'titolo': '💨 Elfbar ELFX Pro Pod Kit (SvapoStore)',
+        'prezzo': '💰 12,90€',
+        'link': 'https://www.svapostore.net/kit-sigarette-elettroniche/elfbar-elfx-pro-pod-kit?tracking=jD7Vnx8Leh2ABPYfEX9LOaSYXtDy6ePBMdWX6kaN5bViiEaB4450Wx2NuOUceDNF'
     }
 }
 
-# Funzione per inviare i messaggi
-def invia_offerte():
-    for categoria, chat_id in canali.items():
-        try:
-            offerta = offerte.get(categoria)
-            if offerta:
-                messaggio = f"{offerta['titolo']}\n\n{offerta['prezzo']}\n🔗 {offerta['link']}"
-                bot.send_message(chat_id, messaggio)
-                print(f"✅ Inviato a {categoria}")
-            else:
-                print(f"⚠️ Nessuna offerta per {categoria}")
-        except Exception as e:
-            print(f"❌ Errore su {categoria}: {e}")
-
-# Ciclo infinito ogni 15 minuti (modificabile)
-if __name__ == "__main__":
-    while True:
-        invia_offerte()
-        time.sleep(900)  # 900 secondi = 15 minuti
+# Invio messaggi
+for categoria, dati in offerte.items():
+    messaggio = f"{dati['titolo']}\n{dati['prezzo']}\n👉 {dati['link']}"
+    try:
+        bot.send_message(canali[categoria], messaggio)
+        print(f"Inviato a {categoria}")
+    except Exception as e:
+        print(f"Errore su {categoria}: {e}")

@@ -1,83 +1,62 @@
-import os
-import requests
-import random
 import telebot
+import requests
 import time
+import os
 
-# --- CONFIG ---
-BOT_TOKEN = os.getenv("BOT_TOKEN")
-CANALI = os.getenv("CANALI").split(",")
-AFFILIATE_ID = os.getenv("AFFILIATE_ID")
-DISCLAIMER = os.getenv("DISCLAIMER", "")
-FREQUENZA_MINUTI = int(os.getenv("FREQUENZA_MINUTI", 60))
-GLITCH_TAG = os.getenv("GLITCH_TAG", "")
-SVAPO_TRACKING = os.getenv("SVAPO_TRACKING", "")
-SVAPO_URL_BASE = os.getenv("SVAPO_URL_BASE", "https://www.svapostore.net")
+BOT_TOKEN = os.environ.get('BOT_TOKEN')
+CANALI = os.environ.get('CANALI').split(',')
+FREQUENZA_MINUTI = int(os.environ.get('FREQUENZA_MINUTI', 15))
+DISCLAIMER = os.environ.get('DISCLAIMER', '')
+GLITCH_TAG = os.environ.get('GLITCH_TAG', '')
+SVAPO_TRACKING = os.environ.get('SVAPO_TRACKING', '')
+SVAPO_URL_BASE = os.environ.get('SVAPO_URL_BASE', 'https://www.svapostore.net')
 
 bot = telebot.TeleBot(BOT_TOKEN)
 
-# --- FUNZIONI DI RACCOLTA OFFERTE ---
-
-def ottieni_offerte_amazon():
-    # Placeholder: Simulazione con offerte statiche (da sostituire con scraping o API reali)
-    offerte = [
-        {
-            "titolo": "[Amazon] Cuffie Bluetooth – 75%",
-            "prezzo": "19,99€",
-            "link": f"https://www.amazon.it/dp/B08P2CL6Y2?tag={AFFILIATE_ID}",
-            "immagine": "https://m.media-amazon.com/images/I/61oYYFq1+wL._AC_SL1500_.jpg"
-        },
-        {
-            "titolo": "[Amazon] Lampada LED Intelligente – 60%",
-            "prezzo": "14,90€",
-            "link": f"https://www.amazon.it/dp/B07P6LJWGT?tag={AFFILIATE_ID}",
-            "immagine": "https://m.media-amazon.com/images/I/71P0v3mAq7L._AC_SL1500_.jpg"
-        }
-    ]
-    return offerte
-
-def ottieni_offerte_svapo():
+def get_offerte_amazon():
+    # Simulazione offerte Amazon (da sostituire con chiamata reale al tuo sistema)
     return [
         {
-            "titolo": "🔥 Aroma Premium Svapo a 2,99€!",
-            "prezzo": "2,99€",
-            "link": f"{SVAPO_URL_BASE}/liquidi-fai-da-te/super-flavor-aroma-madagascar-10ml?tracking={SVAPO_TRACKING}",
-            "immagine": "https://www.svapostore.net/media/catalog/product/cache/b4c25b24ad84c7cd21a2eb859994b9e7/s/u/super_flavor_aroma_madagascar.jpg"
+            'titolo': 'Cuffie Bluetooth Noise Cancelling',
+            'prezzo': '59,99€ (-40%)',
+            'link': 'https://www.amazon.it/dp/B09XXXXXXX?tag=affaritech21-21',
+            'immagine': 'https://m.media-amazon.com/images/I/71XXXXXXX.jpg'
         }
     ]
 
-# --- FUNZIONE DI PUBBLICAZIONE ---
+def get_offerte_svapo():
+    return [
+        {
+            'titolo': 'Elfbar ELFX PRO Pod Kit',
+            'prezzo': '19,90€',
+            'link': f'{SVAPO_URL_BASE}/kit-sigarette-elettroniche/elfbar-elfx-pro-pod-kit?tracking={SVAPO_TRACKING}',
+            'immagine': 'https://www.svapostore.net/img/cms/elfbar-elfx-pro.jpg'
+        }
+    ]
 
-def pubblica_offerta(canale, offerta):
-    messaggio = f"🛒 {offerta['titolo']}\n💰 {offerta['prezzo']}\n🔗 {offerta['link']}\n\n{DISCLAIMER}"
+def invia_offerta(canale, offerta):
     try:
-        if "svapo" in canale:
-            bot.send_message(canale.strip(), messaggio)
-        else:
-            bot.send_photo(canale.strip(), offerta['immagine'], caption=messaggio)
-        print(f"✅ Inviato su {canale.strip()}")
+        messaggio = f"🛒 {offerta['titolo']}\n💰 {offerta['prezzo']}\n🔗 {offerta['link']}\n\n{DISCLAIMER}"
+        bot.send_photo(chat_id=canale, photo=offerta['immagine'], caption=messaggio)
+        print(f"✅ Inviato su {canale}")
     except Exception as e:
-        print(f"❌ Errore su {canale.strip()}: {e}")
-
-# --- CICLO PRINCIPALE ---
+        print(f"❌ Errore su {canale}: {e}")
 
 def ciclo_pubblicazione():
     while True:
-        offerte_amazon = ottieni_offerte_amazon()
-        offerte_svapo = ottieni_offerte_svapo()
+        offerte_amazon = get_offerte_amazon()
+        offerte_svapo = get_offerte_svapo()
 
         for canale in CANALI:
-            if "svapo" in canale:
-                offerta = random.choice(offerte_svapo)
+            if 'svapo' in canale:
+                for offerta in offerte_svapo:
+                    invia_offerta(canale, offerta)
             else:
-                offerta = random.choice(offerte_amazon)
+                for offerta in offerte_amazon:
+                    invia_offerta(canale, offerta)
 
-            pubblica_offerta(canale, offerta)
-
-        print(f"🕒 Atteso prossima pubblicazione...")
+        print(f"⏱ Atteso prossima pubblicazione...")
         time.sleep(FREQUENZA_MINUTI * 60)
-
-# --- AVVIO ---
 
 if __name__ == "__main__":
     ciclo_pubblicazione()

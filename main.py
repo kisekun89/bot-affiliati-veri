@@ -1,4 +1,4 @@
-import time
+iimport time
 import requests
 from telebot import TeleBot
 

@@ -15,49 +15,31 @@ canali = {
     'svapo': -1002523268812
 }
 
-# Funzione per recuperare offerte (statico per ora)
+# Funzione che restituisce offerte simulate
 def recupera_offerte():
     return [
         {
-            'titolo': '🔌 Offerta Tech: Caricatore Anker 20W',
-            'link': 'https://www.amazon.it/dp/B08XYXZ12Z?tag=affaritech21-21',
-            'immagine': 'https://m.media-amazon.com/images/I/61ixzU4gRPL._AC_SL1500_.jpg',
+            'titolo': 'Caricatore USB-C 20W in super offerta!',
+            'link': 'https://www.amazon.it/dp/B09XXYZ12Z?tag=affaritech21-21',
             'categoria': 'tech'
         },
         {
-            'titolo': '🏡 Offerta Casa: Lampada LED Smart Alexa',
-            'link': 'https://www.amazon.it/dp/B08KH5R4D2?tag=affaritech21-21',
-            'immagine': 'https://m.media-amazon.com/images/I/61aywLfXKjL._AC_SL1500_.jpg',
-            'categoria': 'casa'
-        },
-        {
-            'titolo': '🎮 Offerta Gaming: Controller PS4 wireless',
-            'link': 'https://www.amazon.it/dp/B08P2D1JZZ?tag=affaritech21-21',
-            'immagine': 'https://m.media-amazon.com/images/I/61Ig9vM3ubL._AC_SL1500_.jpg',
-            'categoria': 'gaming'
-        },
-        {
-            'titolo': '💥 Super Offerta: Powerbank 20000mAh in sconto!',
-            'link': 'https://www.amazon.it/dp/B08T5QXMKK?tag=affaritech21-21',
-            'immagine': 'https://m.media-amazon.com/images/I/61IlnP+bYIL._AC_SL1500_.jpg',
-            'categoria': 'offerte'
-        },
-        {
-            'titolo': '🔥 SvapoStore: Aroma premium a 2,99€!',
-            'link': 'https://www.svapostore.net/liquidi/aroma-premium-vaniglia?tracking=jD7Vnx8Leh2ABPYfEX9LOaSYXtDy6ePBMdWX6kaN5bViiEaB4450Wx2NuOUceDNF',
-            'immagine': 'https://www.svapostore.net/modules/ph_simpleblog/covers/300.jpg',
+            'titolo': 'Liquido Svapo Vaniglia 10ml a 2,99€',
+            'link': 'https://www.svapostore.net/liquidi/aroma-vaniglia?tracking=jD7Vnx8Leh2A',
             'categoria': 'svapo'
         }
     ]
 
-# Invia le offerte ogni 60 minuti (puoi cambiare il tempo)
+# Invio ogni 15 minuti
 while True:
     offerte = recupera_offerte()
     for offerta in offerte:
-        testo = f"{offerta['titolo']}\n👉 {offerta['link']}"
-        try:
-            bot.send_photo(chat_id=canali[offerta['categoria']], photo=offerta['immagine'], caption=testo)
-            print(f"Inviata a {offerta['categoria']}")
-        except Exception as e:
-            print(f"Errore su {offerta['categoria']}: {e}")
-    time.sleep(3600)  # ogni 60 minuti
+        canale_id = canali.get(offerta['categoria'])
+        if canale_id:
+            messaggio = f"🔥 {offerta['titolo']}\n👉 {offerta['link']}"
+            try:
+                bot.send_message(canale_id, messaggio, disable_web_page_preview=True)
+                print(f"✅ Inviato a {offerta['categoria']}")
+            except Exception as e:
+                print(f"❌ Errore su {offerta['categoria']}: {e}")
+    time.sleep(900)  # ogni 15 minuti

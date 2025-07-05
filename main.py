@@ -44,4 +44,4 @@ while True:
         for offerta in offerte:
             pubblica_offerta(canale, offerta)
     print("Atteso prossima pubblicazione...")
-    time.sleep(FREQUENZA_MINUTI * 60)
+    time.sleep(FREQUENZA_MINUTI * 15)

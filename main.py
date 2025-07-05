@@ -26,7 +26,7 @@ def pubblica_offerte():
     for canale in CANALI:
         try:
             testo = get_offerta(canale.strip())
-            bot.send_message(canale.strip(), testo)
+            bot.send_message(canale.strip(), testo, disable_web_page_preview=True)
             print(f"✅ Pubblicato su {canale}")
         except Exception as e:
             print(f"❌ Errore su {canale}: {e}")

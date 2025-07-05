@@ -2,11 +2,11 @@ import time
 import requests
 from telebot import TeleBot
 
-# Inserisci il token del tuo bot qui
+# Token corretto (con virgolette!)
 TOKEN = '7267062520:AAHPb1Wy1VbsvZ9qBYO-pbaQ6G7PqQbF_KQ'
 bot = TeleBot(TOKEN)
 
-# ID dei tuoi canali Telegram
+# ID reali dei canali
 canali = {
     'tech': -1002532953670,
     'casa': -1002768166518,
@@ -15,24 +15,22 @@ canali = {
     'svapo': -1002523268812
 }
 
-# Offerte da inviare (puoi ampliarle)
 def recupera_offerte():
     return [
         {
             'titolo': '🔌 Offerta Tech: Caricatore USB-C 20W',
-            'link': 'https://www.amazon.it/dp/B09XXYZ12Z?tag=affaritech21-21',
+            'link': 'https://www.amazon.it/dp/B09XQYZ12Z?tag=affaritech21-21',
             'immagine': 'https://m.media-amazon.com/images/I/61ixPBLqW-L._AC_SL1500_.jpg',
             'categoria': 'tech'
         },
         {
-            'titolo': '💨 Offerta Svapo: Aroma Premium alla Vaniglia',
+            'titolo': '💨 Aroma SvapoStore Vaniglia a 2,99€',
             'link': 'https://www.svapostore.net/liquidi/aroma-vaniglia?tracking=jD7Vnx8Leh2ABPYfEX9LOaSYXtDy6ePBMdWX6kaN5bViiEaB4450Wx2NuOUceDNF',
             'immagine': 'https://www.svapostore.net/media/catalog/product/cache/4/image/800x800/9df78eab33525d08d6e5fb8d27136e95/a/r/aroma-vaniglia.jpg',
             'categoria': 'svapo'
         }
     ]
 
-# Invio automatico
 def invia_offerte():
     offerte = recupera_offerte()
     for offerta in offerte:
@@ -48,4 +46,4 @@ def invia_offerte():
 # Loop ogni 15 minuti
 while True:
     invia_offerte()
-    time.sleep(900)  # 15 minuti (900 secondi)
+    time.sleep(900)  # 15 minuti

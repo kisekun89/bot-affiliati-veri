@@ -1,32 +1,53 @@
 import os
 import time
+import requests
 import telebot
-import random
 
-bot_token = os.getenv("BOT_TOKEN")
-chat_ids = os.getenv("CANALI", "").split(",")
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+CANALI = os.getenv("CANALI", "").split(",")
+FREQUENZA_MINUTI = int(os.getenv("FREQUENZA_MINUTI", "15"))
+SVAPO_TRACKING = os.getenv("SVAPO_TRACKING", "")
+AMAZON_TAG = os.getenv("AMAZON_TAG", "affaritech21-21")
 
-bot = telebot.TeleBot(bot_token)
+bot = telebot.TeleBot(BOT_TOKEN)
 
-# OFFERTE FORMATTATE CORRETTAMENTE
-offerte = [
-    "🔥 [Amazon] Lampada LED -70% → https://www.amazon.it/dp/B0772P6LJW/?tag=affaritech21-21",
-    "🔥 [Amazon] Powerbank 10000mAh -40% → https://www.amazon.it/dp/B09N4XQG5B/?tag=affaritech21-21",
-    "🔥 [SvapoStore] Aroma premium a 2,99€! → https://www.svapostore.net/?tracking=jD7Vnx8Leh2ABPYfEX9LoaSYXtDy6ePBMdWX6kaN5bViiEaB4450Wx2NuOUceDNF",
-    "🔥 [SvapoStore] Kit ELFX Pro scontato → https://www.svapostore.net/kit-sigarette-elettroniche/elfbar-elfx-pro-pod-kit?tracking=jD7Vnx8Leh2ABPYfEX9LoaSYXtDy6ePBMdWX6kaN5bViiEaB4450Wx2NuOUceDNF",
-    "🔥 [Amazon] Ciabatta multipresa Smart -50% → https://www.amazon.it/dp/B07ZP6FK8L/?tag=affaritech21-21",
+# 🔧 Esempi temporanei (da sostituire con database offerte vere)
+OFFERTE = [
+    {
+        "titolo": "Powerbank 20000mAh",
+        "prezzo": "14,99€",
+        "immagine": "https://m.media-amazon.com/images/I/61B04f0ALWL._AC_SL1500_.jpg",
+        "link": f"https://www.amazon.it/dp/B08XMBLKR2/?tag={AMAZON_TAG}",
+        "tipo": "amazon"
+    },
+    {
+        "titolo": "Aroma Madagascar 10ml",
+        "prezzo": "2,99€",
+        "immagine": "https://www.svapostore.net/media/catalog/product/cache/1/image/600x/040ec09b1e35df139433887a97daa66f/m/a/madagascar.jpg",
+        "link": f"https://www.svapostore.net/liquidi-fai-da-te/super-flavor-aroma-madagascar-10ml?tracking={SVAPO_TRACKING}",
+        "tipo": "svapo"
+    }
 ]
 
-frequenza_minuti = int(os.getenv("FREQUENZA_MINUTI", 15))
+def filtra_offerta(canale, offerta):
+    if "svapo" in canale and offerta["tipo"] == "svapo":
+        return True
+    elif "svapo" not in canale and offerta["tipo"] == "amazon":
+        return True
+    return False
 
-def invia_offerta():
-    messaggio = random.choice(offerte)
-    for chat_id in chat_ids:
-        try:
-            bot.send_message(chat_id.strip(), messaggio)
-        except Exception as e:
-            print(f"Errore invio a {chat_id}: {e}")
+def pubblica_offerte():
+    for canale in CANALI:
+        for offerta in OFFERTE:
+            if filtra_offerta(canale, offerta):
+                try:
+                    testo = f"🔥 {offerta['titolo']}\n💰 {offerta['prezzo']}\n🔗 {offerta['link']}"
+                    bot.send_photo(canale.strip(), photo=offerta["immagine"], caption=testo)
+                    print(f"✅ Inviato su {canale}")
+                    break  # Una sola offerta per canale ogni 15 minuti
+                except Exception as e:
+                    print(f"❌ Errore su {canale}: {e}")
 
 while True:
-    invia_offerta()
-    time.sleep(frequenza_minuti * 15)
+    pubblica_offerte()
+    time.sleep(FREQUENZA_MINUTI * 15)

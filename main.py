@@ -3,7 +3,7 @@ import requests
 from telebot import TeleBot
 
 # Inserisci il token del tuo bot qui
-TOKEN = 7267062520:AAHPb1Wy1VbsvZ9qBYO-pbaQ6G7PqQbF_KQ
+TOKEN = '7267062520:AAHPb1Wy1VbsvZ9qBYO-pbaQ6G7PqQbF_KQ'
 bot = TeleBot(TOKEN)
 
 # ID dei tuoi canali Telegram

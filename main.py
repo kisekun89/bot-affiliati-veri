@@ -3,59 +3,68 @@ import requests
 from telebot import TeleBot
 
 # TOKEN del bot Telegram
-TOKEN = 'INSERISCI_IL_TUO_TOKEN'
+TOKEN = '7267062520:AAHPb1Wy1VbsvZ9qBYO-pbaQ6G7PqQbF_KQ'
 bot = TeleBot(TOKEN)
 
-# Chat ID dei canali Telegram associati
+# ID dei canali Telegram (con -100 davanti)
 canali = {
-    'tech': -1000000000001,
-    'casa': -1000000000002,
-    'gaming': -1000000000003,
-    'offerte': -1000000000004,
-    'svapo': -1000000000005
+    'tech': -1002532953670,
+    'casa': -1002768166518,
+    'gaming': -1002755987703,
+    'offerte': -1002673875319,
+    'svapo': -1002523268812
 }
 
-# Funzione che recupera le offerte (esempio statico, da sostituire con scraping o API)
+# Funzione che simula il recupero delle offerte (da sostituire con scraping/API)
 def recupera_offerte():
     return [
         {
-            'titolo': 'Offerta Tech: Caricatore USB-C 20W',
-            'link': 'https://www.amazon.it/dp/B09XXXYZ12?tag=affaritech21-21',
+            'titolo': '🔌 Offerta Tech: Caricatore USB-C 20W',
+            'link': 'https://www.amazon.it/dp/B09XXYZ12Z?tag=affaritech21-21',
             'immagine': 'https://m.media-amazon.com/images/I/61xyz.jpg',
             'categoria': 'tech'
         },
         {
-            'titolo': 'Liquido Svapo alla Vaniglia',
-            'link': 'https://www.svapostore.net/liquidi/aroma-vaniglia?tracking=jD7Vnx8Leh2A',
-            'immagine': '',
+            'titolo': '🏡 Offerta Casa: Lampada LED da Comodino',
+            'link': 'https://www.amazon.it/dp/B08XYZL456?tag=affaritech21-21',
+            'immagine': 'https://m.media-amazon.com/images/I/81abc.jpg',
+            'categoria': 'casa'
+        },
+        {
+            'titolo': '🎮 Offerta Gaming: Controller PS5',
+            'link': 'https://www.amazon.it/dp/B09GXYZ123?tag=affaritech21-21',
+            'immagine': 'https://m.media-amazon.com/images/I/91gamepad.jpg',
+            'categoria': 'gaming'
+        },
+        {
+            'titolo': '🔥 Offerta Varie: Sconto top su prodotti scelti!',
+            'link': 'https://www.amazon.it/dp/B09VXYZ789?tag=affaritech21-21',
+            'immagine': 'https://m.media-amazon.com/images/I/91random.jpg',
+            'categoria': 'offerte'
+        },
+        {
+            'titolo': '💨 Offerta Svapo: Aroma Premium alla Vaniglia',
+            'link': 'https://www.svapostore.net/liquidi/aroma-vaniglia?tracking=jD7Vnx8Leh2ABPYfEX9LOaSYXtDy6ePBMdWX6kaN5bViiEaB4450Wx2NuOUceDNF',
+            'immagine': 'https://www.svapostore.net/media/aroma-vaniglia.jpg',
             'categoria': 'svapo'
         }
     ]
 
-# Ciclo principale di pubblicazione
-def pubblica_offerte():
+# Funzione per inviare le offerte nei canali
+def invia_offerte():
     offerte = recupera_offerte()
     for offerta in offerte:
-        categoria = offerta['categoria']
-        titolo = offerta['titolo']
-        link = offerta['link']
+        messaggio = f"{offerta['titolo']}\n👉 {offerta['link']}"
         immagine = offerta['immagine']
+        categoria = offerta['categoria']
 
-        messaggio = f"<b>{titolo}</b>\n\n🔗 {link}"
+        try:
+            bot.send_photo(chat_id=canali[categoria], photo=immagine, caption=messaggio)
+            print(f"Inviata offerta a {categoria}")
+        except Exception as e:
+            print(f"Errore nell'invio a {categoria}: {e}")
 
-        for nome_canale, chat_id in canali.items():
-            if nome_canale == categoria:
-                try:
-                    if 'svapostore.net' in link or immagine == '':
-                        bot.send_message(chat_id, messaggio, parse_mode='HTML')
-                    else:
-                        bot.send_photo(chat_id, photo=immagine, caption=messaggio, parse_mode='HTML')
-                    print(f"✅ Inviato su {nome_canale}")
-                except Exception as e:
-                    print(f"❌ Errore su {nome_canale}: {e}")
-
-# Loop ogni 15 minuti
-if __name__ == '__main__':
-    while True:
-        pubblica_offerte()
-        time.sleep(900)  # 900 secondi = 15 minuti
+# Esegui ogni 15 minuti
+while True:
+    invia_offerte()
+    time.sleep(900)  # 15 minuti (900 secondi)

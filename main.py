@@ -1,87 +1,47 @@
 import telebot
+import requests
 import os
 import time
-import random
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
-CANALI = os.getenv("CANALI", "").split(",")
-FREQUENZA_MINUTI = int(os.getenv("FREQUENZA_MINUTI", "15"))
-
-LINK_SVAPO = os.getenv("LINK_SVAPO", "https://www.svapostore.net/?tracking=jD7Vnx8Leh2ABPYfEX9LOaSYXtDy6ePBMdWX6kaN5bViiEaB4450Wx2NuOUceDNF")
-
-OFFERTE = {
-    "tech": [
-        {
-            "titolo": "Powerbank 20000mAh 🔋",
-            "prezzo": "14,99€",
-            "link": "https://www.amazon.it/dp/B08XMBLKR2?tag=affaritech21-21"
-        },
-        {
-            "titolo": "SSD 1TB Crucial 🚀",
-            "prezzo": "49,99€",
-            "link": "https://www.amazon.it/dp/B08GY8N1HR?tag=affaritech21-21"
-        }
-    ],
-    "casa": [
-        {
-            "titolo": "Lampada LED RGB 🌈",
-            "prezzo": "11,99€",
-            "link": "https://www.amazon.it/dp/B07ZVKTP53?tag=affaritech21-21"
-        },
-        {
-            "titolo": "Profumo uomo 100ml 🔥",
-            "prezzo": "19,90€",
-            "link": "https://www.amazon.it/dp/B08N5WRWNW?tag=affaritech21-21"
-        }
-    ],
-    "nerd": [
-        {
-            "titolo": "Controller PS5 🎮",
-            "prezzo": "49,99€",
-            "link": "https://www.amazon.it/dp/B08H99BPJN?tag=affaritech21-21"
-        },
-        {
-            "titolo": "Funko Pop One Piece 🏴‍☠️",
-            "prezzo": "14,00€",
-            "link": "https://www.amazon.it/dp/B07P7S2F1J?tag=affaritech21-21"
-        }
-    ],
-    "svapo": [
-        {
-            "titolo": "🔥 Offerta SvapoStore",
-            "prezzo": "Aroma premium a 2,99€",
-            "link": LINK_SVAPO
-        }
-    ]
-}
+CANALI = os.getenv("CANALI").split(",")
+DISCLAIMER = os.getenv("DISCLAIMER")
+FREQUENZA_MINUTI = int(os.getenv("FREQUENZA_MINUTI"))
+GLITCH_TAG = os.getenv("GLITCH_TAG")
+NOME_BOT = os.getenv("NOME_BOT")
+SVAPO_TRACKING = os.getenv("SVAPO_TRACKING")
+SVAPO_URL_BASE = os.getenv("SVAPO_URL_BASE")
 
 bot = telebot.TeleBot(BOT_TOKEN)
 
-def scegli_categoria(canale):
-    if "tech" in canale:
-        return "tech"
-    elif "casa" in canale:
-        return "casa"
-    elif "manga" in canale or "gaming" in canale:
-        return "nerd"
-    elif "svapo" in canale:
-        return "svapo"
-    else:
-        return random.choice(["tech", "casa", "nerd"])
+def get_offerte():
+    return [
+        {
+            "titolo": "Lampada LED -70%",
+            "link": f"https://www.amazon.it/dp/B0772P6LJW?tag={os.getenv('AFFILIATE_ID')}",
+            "immagine": "https://m.media-amazon.com/images/I/61b+W1xWRTL._AC_SL1000_.jpg"
+        },
+        {
+            "titolo": "🔥 Offerta SvapoStore: Aroma premium a 2,99€!",
+            "link": f"{SVAPO_URL_BASE}?tracking={SVAPO_TRACKING}",
+            "immagine": "https://www.svapostore.net/media/catalog/product/cache/926507dc7f93631a094422215b778fe0/image/750x750/9df78eab33525d08d6e5fb8d27136e95/a/r/aroma_3_1.jpg"
+        }
+    ]
 
-def invia_offerta(canale):
-    categoria = scegli_categoria(canale)
-    offerta = random.choice(OFFERTE[categoria])
-    messaggio = f"🛒 {offerta['titolo']}
-💰 {offerta['prezzo']}
-🔗 {offerta['link']}"
+def pubblica_offerta(canale, offerta):
     try:
-        bot.send_message(canale.strip(), messaggio)
-        print(f"✅ Inviato su {canale}")
+        messaggio = f"{offerta['titolo']}
+{DISCLAIMER}
+{offerta['link']}"
+        bot.send_photo(chat_id=canale.strip(), photo=offerta['immagine'], caption=messaggio)
+        print(f"Inviato su {canale}")
     except Exception as e:
-        print(f"❌ Errore su {canale}: {e}")
+        print(f"Errore su {canale}: {e}")
 
 while True:
+    offerte = get_offerte()
     for canale in CANALI:
-        invia_offerta(canale)
-    time.sleep(FREQUENZA_MINUTI * 15)
+        for offerta in offerte:
+            pubblica_offerta(canale, offerta)
+    print("Atteso prossima pubblicazione...")
+    time.sleep(FREQUENZA_MINUTI * 60)

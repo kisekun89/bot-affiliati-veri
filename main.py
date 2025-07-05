@@ -30,7 +30,7 @@ def get_offerte():
 
 def pubblica_offerta(canale, offerta):
     try:
-        messaggio = f"{offerta['titolo']}
+        messaggio = f"{offerta['titolo']}"
 {DISCLAIMER}
 {offerta['link']}"
         bot.send_photo(chat_id=canale.strip(), photo=offerta['immagine'], caption=messaggio)
